@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Notification Prioritizer</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">SN</div>
+      <div class="title">
+        <h1>Smart Notification Prioritizer</h1>
+        <p>Colorful glass UI • Local hybrid AI (behavioral logs) • Manual reorder</p>
+      </div>
+    </div>
+
+    <div class="domains-grid" id="domainsGrid"></div>
+
+    <div class="controls">
+      <button id="aiBtn" class="btn">AI Prioritize</button>
+      <button id="manualBtn" class="btn secondary">Manual Mode</button>
+      <button id="resetBtn" class="btn secondary">Reset</button>
+    </div>
+
+    <div class="preview" id="preview">
+      <h3>Priority Preview (enabled domains only)</h3>
+      <div id="priorityList"></div>
+
+      <div id="manualControls" style="margin-top:12px;display:none">
+        <h4 style="margin:8px 0">Manual Reorder</h4>
+        <div id="reorderList" class="reorder"></div>
+        <div style="margin-top:8px">
+          <button id="applyManual" class="btn" style="width:140px">Apply Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const DOMAINS = ['Foods & Grocery','Fashion','Messengers','Social Media','Health','Music','Sports'];
+let enabled = new Set(DOMAINS);
+let priorityOrder = DOMAINS.slice();
+let manualMode = false;
+
+const domainsGrid = document.getElementById('domainsGrid');
+const priorityList = document.getElementById('priorityList');
+const reorderList = document.getElementById('reorderList');
+const manualControls = document.getElementById('manualControls');
+
+function makeIconLetters(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+
+function renderTiles(){
+  domainsGrid.innerHTML = '';
+  const enabledOrdered = priorityOrder.filter(d => enabled.has(d));
+  const disabledOrdered = priorityOrder.filter(d => !enabled.has(d));
+  const renderOrder = enabledOrdered.concat(disabledOrdered);
+  renderOrder.forEach(domain => {
+    const tile = document.createElement('div');
+    tile.className = 'domain-tile ' + (enabled.has(domain) ? 'enabled' : 'disabled');
+    tile.dataset.domain = domain;
+    tile.innerHTML = `
+      <div class="icon">${makeIconLetters(domain)}</div>
+      <div class="content">
+        <div class="title">${domain}</div>
+        <div class="subtitle">${enabled.has(domain) ? 'Enabled' : 'Disabled'}</div>
+      </div>
+    `;
+    tile.addEventListener('click', ()=> window.location.href = '/domain/' + encodeURIComponent(domain));
+    tile.addEventListener('contextmenu', (e)=>{ e.preventDefault(); toggleDomain(domain); });
+    domainsGrid.appendChild(tile);
+  });
+  renderPreview();
+}
+
+function toggleDomain(domain){
+  if (enabled.has(domain)) enabled.delete(domain); else enabled.add(domain);
+  renderTiles();
+}
+
+function renderPreview(){
+  priorityList.innerHTML = '';
+  const enabledOrdered = priorityOrder.filter(d => enabled.has(d));
+  if (enabledOrdered.length === 0){
+    priorityList.innerHTML = '<div class="small" style="color:rgba(230,238,248,0.7)">No domains enabled</div>';
+    return;
+  }
+  enabledOrdered.forEach((d, idx) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<div>${idx+1}. ${d}</div><div class="small">${enabled.has(d)?'Enabled':''}</div>`;
+    priorityList.appendChild(row);
+  });
+}
+
+/* Manual reorder UI */
+function showManualControls(){
+  reorderList.innerHTML = '';
+  const editable = priorityOrder.filter(d => enabled.has(d));
+  editable.forEach((d, idx) => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `
+      <div>${d}</div>
+      <div style="display:flex;gap:6px">
+        <button data-action="up" data-domain="${d}">▲</button>
+        <button data-action="down" data-domain="${d}">▼</button>
+      </div>
+    `;
+    reorderList.appendChild(item);
+  });
+  reorderList.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=> {
+      const action = btn.dataset.action;
+      const domain = btn.dataset.domain;
+      moveDomain(domain, action);
+    });
+  });
+}
+
+function moveDomain(domain, action){
+  const enabledList = priorityOrder.filter(d => enabled.has(d));
+  const idx = enabledList.indexOf(domain);
+  if (idx === -1) return;
+  let newEnabled = enabledList.slice();
+  if (action === 'up' && idx > 0) [newEnabled[idx-1], newEnabled[idx]] = [newEnabled[idx], newEnabled[idx-1]];
+  if (action === 'down' && idx < newEnabled.length - 1) [newEnabled[idx], newEnabled[idx+1]] = [newEnabled[idx+1], newEnabled[idx]];
+  const disabledList = priorityOrder.filter(d => !enabled.has(d));
+  priorityOrder = newEnabled.concat(disabledList);
+  renderTiles();
+  showManualControls();
+}
+
+document.getElementById('applyManual').addEventListener('click', ()=>{
+  manualMode = false;
+  manualControls.style.display = 'none';
+  document.getElementById('manualBtn').textContent = 'Manual Mode';
+  renderTiles();
+});
+
+/* AI Prioritize: train then predict (backend uses sample_dataset.json) */
+document.getElementById('aiBtn').addEventListener('click', async ()=>{
+  try { await fetch('/api/train',{method:'POST'}).then(r=>r.json()).then(j=>console.log('train',j)).catch(()=>{}); } catch(e){console.warn(e);}
+  try {
+    const res = await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body: JSON.stringify({})});
+    const j = await res.json();
+    if (res.ok && j.order && Array.isArray(j.order)){
+      const aiOrder = j.order.filter(d => DOMAINS.includes(d));
+      const missing = DOMAINS.filter(d => !aiOrder.includes(d));
+      priorityOrder = aiOrder.concat(missing);
+      renderTiles();
+      alert('AI prioritized. Top: ' + (priorityOrder[0] || 'none'));
+    } else {
+      alert('AI predict error: ' + (j.error || 'unknown'));
+    }
+  } catch(e){ alert('AI call failed: ' + e.message); }
+});
+
+/* Manual toggle */
+document.getElementById('manualBtn').addEventListener('click', ()=>{
+  manualMode = !manualMode;
+  if (manualMode){
+    manualControls.style.display = 'block';
+    document.getElementById('manualBtn').textContent = 'Exit Manual';
+    showManualControls();
+  } else {
+    manualControls.style.display = 'none';
+    document.getElementById('manualBtn').textContent = 'Manual Mode';
+  }
+});
+
+/* Reset */
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
+  if(!confirm('Reset settings and remove trained model (sample dataset preserved)?')) return;
+  const res = await fetch('/api/reset',{method:'POST'});
+  const j = await res.json();
+  if (j.status === 'reset_ok'){
+    alert('Reset done.'); enabled = new Set(DOMAINS); priorityOrder = DOMAINS.slice(); renderTiles();
+  } else alert('Reset failed.');
+});
+
+renderTiles();
+</script>
+</body>
+</html>

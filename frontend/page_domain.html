@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Domain Settings</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <div style="max-width:1000px;margin:28px auto;padding:18px">
+    <a href="/" style="color:#9fb6ff">← Back</a>
+    <div id="container" style="margin-top:12px"></div>
+  </div>
+<script>
+const params = window.location.pathname.split('/');
+const domain = decodeURIComponent(params[2] || 'Unknown');
+const container = document.getElementById('container');
+
+container.innerHTML = `
+  <h2>${domain}</h2>
+  <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:12px">
+    <div style="flex:1;min-width:320px">
+      <div class="card">
+        <h3>Customize</h3>
+        <div class="settings-grid" style="margin-top:12px">
+          <div class="setting-tile">
+            <div class="big">Priority</div>
+            <div class="small">Set priority level for this domain</div>
+            <select id="prioritySelect" style="margin-top:12px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03)">
+              <option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option>
+            </select>
+          </div>
+
+          <div class="setting-tile">
+            <div class="big">Sound</div>
+            <div class="small">Choose a tone</div>
+            <select id="soundSelect" style="margin-top:12px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03)">
+              <option value="chime">Chime</option><option value="ping">Ping</option><option value="bloop">Bloop</option><option value="melody">Short Melody</option>
+            </select>
+          </div>
+
+          <div class="setting-tile">
+            <div class="big">Vibration</div>
+            <div class="small">Choose pattern</div>
+            <select id="vibSelect" style="margin-top:12px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03)">
+              <option value="none">None</option><option value="short">Short</option><option value="long">Long</option><option value="pulse">Pulse</option>
+            </select>
+          </div>
+
+          <div class="setting-tile">
+            <div class="big">Volume</div>
+            <div class="small">Adjust volume</div>
+            <input id="volumeRange" type="range" min="0" max="100" value="70" style="margin-top:12px;width:100%"/>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:10px">
+          <button id="saveBtn" class="btn">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:360px;min-width:260px">
+      <div class="card">
+        <h3>Mock Notifications</h3>
+        <div id="leftNotifs" class="notif-list"></div>
+      </div>
+    </div>
+  </div>
+`;
+
+const leftNotifs = document.getElementById('leftNotifs');
+const MOCK_NOTIFS = [
+  {title:'Notification 1', meta:'App • 1h', priority:'medium'},
+  {title:'Notification 2', meta:'App • 2h', priority:'low'},
+  {title:'Notification 3', meta:'App • now', priority:'high'},
+  {title:'Notification 4', meta:'App • 5h', priority:'low'},
+  {title:'Notification 5', meta:'App • 1d', priority:'low'}
+];
+MOCK_NOTIFS.forEach(n=>{
+  const el = document.createElement('div');
+  el.className = 'notif';
+  el.innerHTML = `<div><strong>${n.title}</strong><div class="small">${n.meta}</div></div><div class="small">${n.priority}</div>`;
+  leftNotifs.appendChild(el);
+});
+
+async function loadSettings(){
+  try{
+    const res = await fetch('/api/settings/' + encodeURIComponent(domain));
+    const j = await res.json();
+    if(Object.keys(j).length){
+      document.getElementById('prioritySelect').value = j.priority || 'medium';
+      document.getElementById('soundSelect').value = j.sound || 'chime';
+      document.getElementById('vibSelect').value = j.vibration || 'short';
+      document.getElementById('volumeRange').value = j.volume || 70;
+    }
+  }catch(e){}
+}
+loadSettings();
+
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  const payload = {
+    priority: document.getElementById('prioritySelect').value,
+    sound: document.getElementById('soundSelect').value,
+    vibration: document.getElementById('vibSelect').value,
+    volume: document.getElementById('volumeRange').value
+  };
+  const res = await fetch('/api/settings/' + encodeURIComponent(domain), {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+  });
+  if(res.ok){ alert('Settings saved'); window.location.href = '/'; }
+  else alert('Failed to save settings');
+});
+</script>
+</body>
+</html>

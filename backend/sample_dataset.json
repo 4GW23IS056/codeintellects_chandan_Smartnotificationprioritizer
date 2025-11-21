@@ -1,0 +1,42 @@
+{
+  "events": [
+    {"domain":"Messengers","received":1706092000,"opened":1,"dismissed":0,"action_clicked":1,"delay_seconds":3},
+    {"domain":"Messengers","received":1706091000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":20},
+    {"domain":"Messengers","received":1706089000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":600},
+    {"domain":"Messengers","received":1706087000,"opened":1,"dismissed":0,"action_clicked":1,"delay_seconds":5},
+    {"domain":"Messengers","received":1706085000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":30},
+
+    {"domain":"Foods & Grocery","received":1706090100,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":150},
+    {"domain":"Foods & Grocery","received":1706080000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":300},
+    {"domain":"Foods & Grocery","received":1706078000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":2000},
+    {"domain":"Foods & Grocery","received":1706072000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":1800},
+    {"domain":"Foods & Grocery","received":1706067000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":400},
+
+    {"domain":"Social Media","received":1706089000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":1200},
+    {"domain":"Social Media","received":1706083000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":900},
+    {"domain":"Social Media","received":1706081000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":2400},
+    {"domain":"Social Media","received":1706079000,"opened":1,"dismissed":0,"action_clicked":1,"delay_seconds":120},
+    {"domain":"Social Media","received":1706075000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":3600},
+
+    {"domain":"Health","received":1706093000,"opened":1,"dismissed":0,"action_clicked":1,"delay_seconds":10},
+    {"domain":"Health","received":1706090000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":40},
+    {"domain":"Health","received":1706086000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":60},
+    {"domain":"Health","received":1706082000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":20},
+    {"domain":"Health","received":1706078000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":400},
+
+    {"domain":"Music","received":1706078000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":8000},
+    {"domain":"Music","received":1706072000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":7200},
+    {"domain":"Music","received":1706066000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":3600},
+    {"domain":"Music","received":1706059000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":10000},
+    {"domain":"Music","received":1706053000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":20000},
+
+    {"domain":"Sports","received":1706091500,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":300},
+    {"domain":"Sports","received":1706088000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":3600},
+    {"domain":"Sports","received":1706081000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":4800},
+    {"domain":"Sports","received":1706074000,"opened":1,"dismissed":0,"action_clicked":0,"delay_seconds":400},
+    {"domain":"Sports","received":1706067000,"opened":0,"dismissed":1,"action_clicked":0,"delay_seconds":7200}
+  ],
+  "meta": {
+    "description": "Per-notification event logs (opened/dismissed/action/delay) — used for learning priorities"
+  }
+}

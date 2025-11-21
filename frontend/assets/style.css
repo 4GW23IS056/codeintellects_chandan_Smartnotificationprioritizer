@@ -1,0 +1,227 @@
+/* -------------- GLOBAL VARIABLES -------------- */
+:root{
+  --bg:#040b20;
+  --glass-bg: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.12);
+  --glass-blur: 18px;
+  --muted: rgba(230,238,248,0.8);
+
+  --grad1: #6ee7b7;
+  --grad2: #60a5fa;
+  --grad3: #f472b6;
+
+  --shadow-strong: 0 25px 60px rgba(0,0,0,0.55);
+  --shadow-soft: 0 15px 35px rgba(0,0,0,0.35);
+}
+
+/* ----------------- RESET ----------------- */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',system-ui}
+body{
+  background: radial-gradient(circle at 20% 20%, #0a1d40, #040b20 60%);
+  color:#fff;
+  overflow-x:hidden;
+  animation: bgAnim 15s infinite alternate ease-in-out;
+}
+@keyframes bgAnim{
+  0%{background-position:0% 0%;}
+  100%{background-position:100% 100%;}
+}
+
+/* ----------------- CONTAINER ----------------- */
+.container{max-width:1180px;margin:30px auto;padding:20px;animation:fadeIn 0.8s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;}}
+
+/* ---------------- HEADER ---------------- */
+.header{display:flex;gap:12px;align-items:center;}
+
+/* LOGO ANIMATION */
+.logo{
+  width:70px;height:70px;border-radius:15px;
+  background:linear-gradient(135deg,var(--grad1),var(--grad2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:900;color:#032;
+  box-shadow:var(--shadow-strong);
+  animation:floatLogo 4s infinite ease-in-out;
+}
+@keyframes floatLogo{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+  100%{transform:translateY(0);}
+}
+
+.title h1{font-size:24px;letter-spacing:0.5px;}
+.title p{margin-top:4px;font-size:13px;color:var(--muted);}
+
+/* ---------------- GRID ---------------- */
+.domains-grid{
+  margin-top:24px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
+  gap:22px;
+}
+
+/* ---------------- TILE (MAIN) ---------------- */
+.domain-tile{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:18px;
+  padding:18px;
+  display:flex;gap:16px;
+  align-items:center;
+  backdrop-filter:blur(var(--glass-blur));
+  box-shadow:var(--shadow-soft);
+  cursor:pointer;
+  transition:transform 0.25s ease, box-shadow 0.25s ease, opacity .3s;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Glow animation when enabled */
+.domain-tile.enabled::after{
+  content:"";
+  position:absolute;
+  bottom:-20px;left:-20px;
+  width:120px;height:120px;
+  background: radial-gradient(circle, rgba(110,231,183,0.4), transparent 70%);
+  filter:blur(40px);
+  animation:softGlow 4s infinite ease-in-out;
+}
+@keyframes softGlow{
+  0%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(20px,20px) scale(1.2);}
+  100%{transform:translate(0,0) scale(1);}
+}
+
+/* Hover 3D movement & lift */
+.domain-tile:hover{
+  transform: translateY(-12px) scale(1.03) rotateX(6deg);
+  box-shadow:0 30px 70px rgba(0,0,0,0.6);
+}
+
+/* Disabled state */
+.domain-tile.disabled{
+  opacity:0.35;filter:grayscale(0.5);
+  transform:none;box-shadow:none;
+}
+
+/* Icon block */
+.icon{
+  width:72px;height:72px;
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:24px;
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(5px);
+  transition:transform 0.3s ease;
+}
+
+/* Icon slight bounce */
+.domain-tile:hover .icon{
+  transform:scale(1.12);
+}
+
+.content .title{font-size:17px;font-weight:700;}
+.content .subtitle{font-size:13px;color:var(--muted);margin-top:6px;}
+
+/* ---------------- BUTTONS ---------------- */
+.controls{display:flex;gap:14px;margin-top:20px;}
+
+.btn{
+  flex:1;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  font-weight:800;
+  cursor:pointer;
+  color:#022;
+  background:linear-gradient(90deg,var(--grad2),var(--grad1));
+  box-shadow:0 12px 30px rgba(16,185,129,0.18);
+  transition:transform 0.25s ease, box-shadow 0.25s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Button ripple */
+.btn::after{
+  content:"";
+  position:absolute;top:50%;left:50%;
+  width:0;height:0;
+  background:rgba(255,255,255,0.4);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .4s ease, height .4s ease;
+}
+.btn:active::after{
+  width:200px;height:200px;
+}
+
+.btn:hover{
+  transform:translateY(-6px);
+  box-shadow:0 16px 40px rgba(16,185,129,0.25);
+}
+
+.btn.secondary{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:var(--muted);
+  box-shadow:none;
+}
+
+/* ---------------- PREVIEW PANEL ---------------- */
+.preview{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:18px;
+  margin-top:24px;
+  backdrop-filter:blur(12px);
+  box-shadow:var(--shadow-soft);
+  animation:fadeInUp .7s ease;
+}
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;}
+}
+
+.preview .row{
+  padding:12px;
+  margin:10px 0;
+  border-radius:12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;justify-content:space-between;
+  animation:slideRow .6s ease;
+}
+@keyframes slideRow{
+  from{transform:translateX(-20px);opacity:0;}
+  to{transform:translateX(0);opacity:1;}
+}
+
+/* ---------------- MANUAL REORDER ---------------- */
+.reorder .item{
+  background:rgba(255,255,255,0.03);
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;justify-content:space-between;
+  animation:fadeIn 0.4s ease;
+}
+.reorder button{
+  padding:6px 10px;
+  border-radius:8px;
+  border:none;
+  background:rgba(255,255,255,0.08);
+  color:var(--muted);
+  cursor:pointer;
+  transition:transform .2s ease;
+}
+.reorder button:hover{
+  transform:scale(1.1);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media(max-width:760px){
+  .domains-grid{grid-template-columns:1fr;}
+  .icon{width:64px;height:64px;}
+}
